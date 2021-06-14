@@ -9,7 +9,8 @@
     "plugin:react/recommended"
   ],
   "plugins": [
-    "react"
+    "react",
+    "cypress"
   ],
   "parserOptions": {
     "project": "./tsconfig-eslint.json"

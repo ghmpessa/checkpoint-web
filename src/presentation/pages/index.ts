@@ -1,0 +1,6 @@
+export { default as Login } from './login/login'
+export { default as SignUp } from './sign-up/sign-up'
+export { default as Feed } from './feed/feed'
+export { default as SearchGroups } from './search-groups/search-groups'
+export { default as Profile } from './profile/profile'
+export { default as Group } from './group/group'

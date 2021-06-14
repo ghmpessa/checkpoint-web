@@ -1,9 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Router from '@/main/routes/router'
-import '@/presentation/styles/global.scss'
+import { Theme } from '@/presentation/styles/theme'
+import { CssBaseline, ThemeProvider } from '@material-ui/core'
 
 ReactDOM.render(
-  <Router />,
+  <ThemeProvider theme={Theme}>
+    <CssBaseline />
+    <Router />
+  </ThemeProvider>,
   document.getElementById('main')
 )
