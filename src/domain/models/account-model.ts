@@ -1,7 +1,7 @@
 export type AccountModel = {
-  accessToken: string
   name: string
   userId: string
+  accessToken: string
 }
 
 export type ProfileModel = {
@@ -12,4 +12,10 @@ export type ProfileModel = {
   avatarPath?: string | null
   createdAt?: string
   updatedAt?: string
+}
+
+export type ProfileShortModel = {
+  id?: string
+  username?: string
+  name?: string
 }

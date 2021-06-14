@@ -1,17 +1,17 @@
 import { HttpClient, HttpStatusCode } from '../../protocols'
 import { ServerError, UnexpectedError } from '../../../domain/errors'
-import { ProfileModel } from '../../../domain/models'
-import { LoadAccount } from '../../../domain/usecases'
+import { GroupModel } from '../../../domain/models'
+import { LoadMyGroups } from '../../../domain/usecases'
 
-export class RemoteLoadAccount implements LoadAccount {
+export class RemoteLoadMyGroups implements LoadMyGroups {
   constructor(
     private readonly url: string,
-    private readonly httpClient: HttpClient<ProfileModel>
+    private readonly httpClient: HttpClient<GroupModel[]>
   ) { }
 
-  async load(userId: string): Promise<ProfileModel> {
+  async load(): Promise<GroupModel[]> {
     const httpResponse = await this.httpClient.request({
-      url: `${this.url}/${userId}`,
+      url: this.url,
       method: 'get'
     })
 

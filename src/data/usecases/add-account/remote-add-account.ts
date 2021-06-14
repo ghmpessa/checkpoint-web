@@ -4,12 +4,12 @@ import { UnexpectedError, InvalidParamError, ServerError } from '../../../domain
 import { AccountModel } from '../../../domain/models'
 
 export class RemoteAddAccount implements AddAccount {
-  constructor (
+  constructor(
     private readonly url: string,
     private readonly httpClient: HttpClient<AccountModel>
   ) { }
 
-  async add (params: AddAccountParams): Promise<AccountModel> {
+  async add(params: AddAccountParams): Promise<AccountModel> {
     const httpResponse = await this.httpClient.request({
       url: this.url,
       body: params,

@@ -3,12 +3,12 @@ import { HttpClient, HttpStatusCode } from '../../protocols'
 import { UnexpectedError, ServerError, InvalidParamError } from '../../../domain/errors'
 
 export class RemoteEditAccount implements EditAccount {
-  constructor (
+  constructor(
     private readonly url: string,
     private readonly httpClient: HttpClient<any>
   ) { }
 
-  async edit (params: AddAccountParams): Promise<any> {
+  async edit(params: AddAccountParams): Promise<any> {
     const httpResponse = await this.httpClient.request({
       url: this.url,
       body: params,
