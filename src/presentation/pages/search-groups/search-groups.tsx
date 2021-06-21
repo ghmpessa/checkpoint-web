@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react'
+import React, { Fragment, useContext, useState , useEffect } from 'react'
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -312,6 +312,10 @@ const SearchGroups: React.FC<Props> = ({ createGroup, loadGroups }: Props) => {
       setError(error.message)
     }
   }
+
+  useEffect(() => {
+    handleSearch()
+  }, [])
 
   const modal = (
     <Dialog
