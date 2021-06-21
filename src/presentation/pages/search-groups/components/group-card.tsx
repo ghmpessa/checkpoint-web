@@ -7,6 +7,8 @@ import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
+import { GroupModel } from '@/domain/models'
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles({
   root: {
@@ -24,49 +26,54 @@ const useStyles = makeStyles({
   },
   buttonsWrap: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     margin: '0 20px 10px'
   },
   members: {
-    fontSize: 16
+    fontSize: 16,
+    color: '#666666'
   },
   buttonLabel: {
     color: '#ffffff',
     fontWeight: 'bold',
     textTransform: 'none'
+  },
+  link: {
+    textDecoration: 'none',
+    color: '#fff'
   }
 })
 
-const GroupCard: React.FC = () => {
+type Props = {
+  group: GroupModel
+}
+
+const GroupCard: React.FC<Props> = ({ group }: Props) => {
   const classes = useStyles()
 
   return (
     <Card className={classes.root}>
       <CardActionArea>
-        <CardMedia
-          className={classes.media}
-          image="/static/images/cards/contemplative-reptile.jpg"
-          title="Contemplative Reptile"
-        />
         <CardContent>
-          <div className={classes.titleWrap}>
-            <Typography gutterBottom variant="h5" component="h2">
-              CS:GO
-            </Typography>
-            <Typography className={classes.members} gutterBottom variant="h5" component="h2">
-              3500 members
-            </Typography>
-          </div>
-          <Typography variant="body1" color="textPrimary" component="p">
-            The biggest CS:GO checkpoint community you will ever see, join us!
+          <Typography gutterBottom variant="h5" component="h2">
+            {group.name}
+          </Typography>
+          <Typography className={classes.members} gutterBottom variant="h5" component="h2">
+            {`Tag: #${group.tag}`}
+          </Typography>
+          <Typography className={classes.members} variant="body1" color="textPrimary" component="p">
+            {`Created at: ${new Date(group.createdAt).toLocaleDateString()}`}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions className={classes.buttonsWrap}>
-        <Button classes={{
+        <Button
+        classes={{
           label: classes.buttonLabel
         }} size="small" color="primary" variant='contained'>
-          See Group
+          <Link className={classes.link} to={`group/${group.id}`}>
+            see group
+          </Link>
         </Button>
       </CardActions>
     </Card>

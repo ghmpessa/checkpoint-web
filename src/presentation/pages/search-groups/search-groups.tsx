@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useContext, useState } from 'react'
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -18,7 +18,8 @@ import { TextField, Select, Dialog, DialogTitle, DialogContent, DialogActions, F
 import GroupCard from './components/group-card'
 import { useHistory } from 'react-router-dom'
 import { CommunityContext } from '@/presentation/contexts/'
-import { CreateGroup } from '@/domain/usecases'
+import { CreateGroup, LoadGroups } from '@/domain/usecases'
+import { GroupModel } from '@/domain/models'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     search: {
       position: 'relative',
+      margin: 10,
       borderRadius: theme.shape.borderRadius,
       backgroundColor: fade(theme.palette.common.white, 0.5),
       '&:hover': {
@@ -144,6 +146,11 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#323232',
       padding: 10,
       color: '#f1f1f1'
+    },
+    button: {
+      textTransform: 'none',
+      color: '#fff',
+      fontWeight: 'bold'
     }
   })
 )
@@ -209,19 +216,6 @@ const PrimarySearchAppBar = (): any => {
           <Typography className={classes.title} variant="h6" noWrap>
             checkpoint
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton
@@ -265,18 +259,21 @@ const PrimarySearchAppBar = (): any => {
 
 type Props = {
   createGroup: CreateGroup
+  loadGroups: LoadGroups
 }
 
-const SearchGroups: React.FC<Props> = ({ createGroup }: Props) => {
+const SearchGroups: React.FC<Props> = ({ createGroup, loadGroups }: Props) => {
   const example = [1, 2, 3, 4]
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [search, setSearch] = useState('')
   const [group, setGroup] = useState({
     name: '',
     description: ''
   })
+  const [groups, setGroups] = useState<GroupModel[]>([])
 
   const handleCreate = async (): Promise<void> => {
     if (error) {
@@ -293,6 +290,22 @@ const SearchGroups: React.FC<Props> = ({ createGroup }: Props) => {
 
       createGroup.create(group)
       setError('Your group has been created!')
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      setError(error.message)
+    }
+  }
+
+  const handleSearch = async (): Promise<void> => {
+    try {
+      if (loading) {
+        return
+      }
+
+      setLoading(true)
+      const groups = await loadGroups.load({ search })
+      setGroups(groups)
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -325,14 +338,29 @@ const SearchGroups: React.FC<Props> = ({ createGroup }: Props) => {
 
   return (
     <div>
+      <CommunityContext.Provider value={{ open, setOpen, search, setSearch, groups, setGroups, error, setError }}>
       {PrimarySearchAppBar()}
-      <CommunityContext.Provider value={{ open, setOpen }}>
         <div className={classes.content}>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="search group…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+              onChange={e => setSearch(e.target.value)}
+            />
+            { !!search.length && <Button variant='contained' color='primary' className={classes.button} onClick={handleSearch} >search</Button>}
+          </div>
           <Button onClick={() => setOpen(!open) } type='button' variant='outlined' color='primary' startIcon={<AddIcon />} >Create Group</Button>
           {
-            example.map(item => (
-              <div key={item}>
-                <GroupCard />
+            groups.map(group => (
+              <div key={group.id}>
+                <GroupCard group={group} />
               </div>
             ))
           }

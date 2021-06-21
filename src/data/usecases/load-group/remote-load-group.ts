@@ -4,15 +4,15 @@ import { GroupModel } from '../../../domain/models'
 import { LoadGroup } from '../../../domain/usecases'
 
 export class RemoteLoadGroup implements LoadGroup {
-  constructor(
+  constructor (
     private readonly url: string,
     private readonly httpClient: HttpClient<GroupModel>
   ) { }
 
-  async load(groupId: string): Promise<GroupModel> {
+  async load (): Promise<GroupModel> {
     const httpResponse = await this.httpClient.request({
       url: this.url,
-      method: 'get',
+      method: 'get'
     })
 
     switch (httpResponse.status) {

@@ -4,14 +4,14 @@ import { ProfileModel } from '../../../domain/models'
 import { LoadAccount } from '../../../domain/usecases'
 
 export class RemoteLoadAccount implements LoadAccount {
-  constructor(
+  constructor (
     private readonly url: string,
     private readonly httpClient: HttpClient<ProfileModel>
   ) { }
 
-  async load(userId: string): Promise<ProfileModel> {
+  async load (): Promise<ProfileModel> {
     const httpResponse = await this.httpClient.request({
-      url: `${this.url}/${userId}`,
+      url: this.url,
       method: 'get'
     })
 

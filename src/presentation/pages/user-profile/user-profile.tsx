@@ -1,7 +1,8 @@
-/* eslint-disable no-useless-return */
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { useEffect, useContext, useState, Fragment } from 'react'
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
+import Paper from '@material-ui/core/Paper'
+import Avatar from '@material-ui/core/Avatar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
@@ -12,15 +13,15 @@ import GroupIcon from '@material-ui/icons/Group'
 import SearchIcon from '@material-ui/icons/Search'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import MoreIcon from '@material-ui/icons/MoreVert'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
+import SettingsIcon from '@material-ui/icons/Settings'
+import PersonIcon from '@material-ui/icons/Person'
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmail'
+import Badge from '@material-ui/core/Badge'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import { useHistory } from 'react-router'
-import Paper from '@material-ui/core/Paper'
-import { AddPost, JoinGroup, LoadGroup, LoadMembers, LoadPosts } from '@/domain/usecases'
-import { GroupModel, PostModel, ProfileShortModel } from '@/domain/models'
-import FeedCard from './components/feed-card'
-import MemberCard from './components/members-card'
+import { withStyles } from '@material-ui/styles'
+import { LoadAccount } from '@/domain/usecases'
+import { ProfileModel } from '@/domain/models'
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,38 +117,14 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       padding: 80
     },
-    modal: {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
+    paper: {
       backgroundColor: '#323232',
-      padding: 15
-    },
-    modalContent: {
+      width: 500,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center'
     },
-    modalFields: {
-      margin: 10,
-      width: '100%'
-    },
-    modalButton: {
-      color: '#ffffff',
-      textTransform: 'none',
-      fontWeight: 'bold',
-      fontSize: 16,
-      margin: 10,
-      alignSelf: 'center',
-      width: '100%'
-    },
-    select: {
-      backgroundColor: '#323232',
-      padding: 10,
-      color: '#f1f1f1'
-    },
-    header: {
+    profileHeader: {
       display: 'flex',
       width: '100%',
       flexDirection: 'column',
@@ -161,22 +138,103 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 40,
       boxShadow: '50'
     },
-    paper: {
-      backgroundColor: '#323232',
-      width: 500,
+    iconButton: {
+      color: '#f1f1f1',
+      position: 'absolute',
+      top: 0,
+      right: 10
+    },
+    avatar: {
+      height: 150,
+      width: 150
+    },
+    badgeText: {
+      color: '#000',
+      fontWeight: 'bold',
+      fontSize: 20
+    },
+    anchorOriginBottomRightCircle: {
+      right: '50%',
+      bottom: '5%'
+    },
+    profileName: {
+      margin: 15
+    },
+    aboutWrap: {
+      padding: 10,
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center'
+      width: '100%'
     },
-    headerTitle: {
-      fontSize: 28,
-      color: '#f1f1f1',
-      textAlign: 'center'
+    infoWrap: {
+      border: '1px solid #666666',
+      padding: '5px 10px',
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      marginTop: 10,
+      marginBottom: 10,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        animation: '$ripple 1.2s infinite ease-in-out',
+        border: '1px solid currentColor',
+        content: '""'
+      }
     },
-    subtitle: {
-      fontSize: 20,
-      color: '#666666',
-      textAlign: 'center'
+    infoText: {
+      fontWeight: 'bold',
+      fontSize: 20
+    },
+    infoIcon: {
+      position: 'absolute',
+      left: 15,
+      width: 30,
+      height: 30
+    },
+    twitch: {
+      border: '1px solid #a970ff',
+      padding: '5px 10px',
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      marginTop: 10,
+      marginBottom: 10,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        animation: '$ripple 1.2s infinite ease-in-out',
+        border: '1px solid #a970ff',
+        content: '""'
+      }
+    },
+    '@keyframes ripple': {
+      '0%': {
+        transform: 'scale(1)',
+        opacity: 1
+      },
+      '100%': {
+        transform: 'scale(1)',
+        opacity: 0
+      }
+    },
+    input: {
+      textAlign: 'center',
+      fontSize: 24,
+      fontWeight: 'bold'
+    },
+    inputWrap: {
+      margin: 20
     },
     button: {
       color: '#ffffff',
@@ -184,36 +242,66 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 'bold',
       fontSize: 16,
       margin: 15,
-      width: '70%',
+      width: '10vh',
       alignSelf: 'center'
     },
-    buttonsWrap: {
-      display: 'flex'
-    },
-    feedButton: {
-      textTransform: 'none',
-      color: '#f1f1f1',
-      fontWeight: 'bold'
-    },
-    addPostWrap: {
+    editWrap: {
+      border: `1px solid ${theme.palette.primary.main}`,
+      padding: '5px 10px',
+      width: '100%',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      width: '100%',
-      paddingRight: 50,
-      paddingLeft: 50
-    },
-    addPostButton: {
-      color: '#ffffff',
-      textTransform: 'none',
-      fontWeight: 'bold',
-      fontSize: 16,
-      margin: 15,
-      alignSelf: 'center'
+      position: 'relative',
+      marginTop: 10,
+      marginBottom: 10,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        animation: '$ripple 1.2s infinite ease-in-out',
+        border: `1px solid ${theme.palette.primary.main}`,
+        content: '""'
+      }
     }
   })
 )
+
+const StyledBadge = withStyles((theme: Theme) =>
+  createStyles({
+    badge: {
+      backgroundColor: '#44b700',
+      color: '#000',
+      height: 30,
+      width: 30,
+      borderRadius: 15,
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        borderRadius: '50%',
+        animation: '$ripple 1.2s infinite ease-in-out',
+        border: '1px solid currentColor',
+        content: '""'
+      }
+    },
+    '@keyframes ripple': {
+      '0%': {
+        transform: 'scale(.8)',
+        opacity: 1
+      },
+      '100%': {
+        transform: 'scale(2.4)',
+        opacity: 0
+      }
+    }
+  })
+)(Badge)
 
 const PrimarySearchAppBar = (): any => {
   const classes = useStyles()
@@ -284,7 +372,7 @@ const PrimarySearchAppBar = (): any => {
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={() => history.replace('/community')}
-              className={classes.ActiveIcon}
+              className={classes.icons}
             >
               <GroupIcon />
             </IconButton>
@@ -294,7 +382,7 @@ const PrimarySearchAppBar = (): any => {
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={() => history.replace('/profile')}
-              className={classes.icons}
+              className={classes.ActiveIcon}
             >
               <AccountCircle />
             </IconButton>
@@ -318,114 +406,25 @@ const PrimarySearchAppBar = (): any => {
 }
 
 type Props = {
-  joinGroup: JoinGroup
-  loadGroup: LoadGroup
-  loadPosts: LoadPosts
-  loadMembers: LoadMembers
-  addPost: AddPost
+  loadAccount: LoadAccount
 }
 
-const Group: React.FC<Props> = ({ joinGroup, loadGroup, loadPosts, loadMembers, addPost }: Props) => {
+const UserProfile: React.FC<Props> = ({ loadAccount }: Props) => {
   const classes = useStyles()
 
-  const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [group, setGroup] = useState<GroupModel>({
-    id: '',
+  const [user, setUser] = useState<ProfileModel>({
+    username: '',
     name: '',
-    tag: '',
-    adminId: '',
-    bindingId: '',
-    createdAt: '',
-    updatedAt: ''
+    email: ''
   })
-  const [posts, setPosts] = useState<PostModel[]>([])
-  const [selected, setSelected] = useState({
-    feed: true,
-    members: false
-  })
-  const [members, setMembers] = useState<ProfileShortModel[]>([])
-  const [text, setText] = useState('')
-
-  const handleJoin = async (): Promise<void> => {
-    try {
-      if (loading) {
-        return
-      }
-
-      setLoading(true)
-
-      joinGroup.join({
-        bind: true,
-        groupId: '60c6c414c63726a560d882b0'
-      })
-
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      setError(error.message)
-    }
-  }
-
-  const handleMembers = async (): Promise<void> => {
-    try {
-      if (loading || selected.members) {
-        return
-      }
-      setLoading(true)
-      setSelected({ feed: false, members: true })
-      const members = await loadMembers.load(group.id)
-      setMembers(members)
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      setError(error.message)
-    }
-  }
-
-  const fetchPosts = async (groupId?: string): Promise<void> => {
-    try {
-      const posts = await loadPosts.load(groupId || group.id)
-      setPosts(posts.reverse())
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      setError(error.message)
-    }
-  }
-
-  const handleFeed = (): void => {
-    setSelected({ members: false, feed: true })
-    setLoading(true)
-    fetchPosts()
-  }
-
-  const handlePost = async (): Promise<void> => {
-    try {
-      if (loading) {
-        return
-      }
-
-      setLoading(true)
-      await addPost.post({
-        text,
-        groupId: group.id
-      })
-      setLoading(true)
-      fetchPosts()
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      setError(error.message)
-    }
-  }
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    setLoading(true)
-    loadGroup.load()
-      .then(group => {
-        setGroup(group)
-        fetchPosts(group.id)
+    loadAccount.load()
+      .then(user => {
+        setUser(user)
+        setLoading(false)
       })
       .catch(error => {
         setLoading(false)
@@ -443,38 +442,45 @@ const Group: React.FC<Props> = ({ joinGroup, loadGroup, loadPosts, loadMembers, 
             : error
               ? <span>{error}</span>
               : <Paper className={classes.paper} elevation={5}>
-            <Paper className={classes.header} elevation={3}>
-              <Typography className={classes.headerTitle}>{group.name}</Typography>
-              <Typography className={classes.subtitle}>{`#${group.tag}`}</Typography>
-              <Typography className={classes.subtitle}>{`Created at: ${new Date(group.createdAt).toLocaleDateString()}`}</Typography>
-              <Button onClick={handleJoin} className={classes.button} variant='contained' color='primary'>join group</Button>
+            <Paper className={classes.profileHeader} elevation={3}>
+              <StyledBadge
+                overlap='circle'
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                classes={{
+                  badge: classes.badgeText,
+                  anchorOriginBottomRightCircle: classes.anchorOriginBottomRightCircle
+                }}
+                badgeContent={user.level}
+              >
+                <Avatar className={classes.avatar} />
+              </StyledBadge>
+              <Typography variant='h4' className={classes.profileName}>{user.username}</Typography>
             </Paper>
-            <div className={classes.buttonsWrap}>
-              <Button className={classes.feedButton} style={{ color: selected.feed ? '#61FF00' : '#f1f1f1' }} variant='text' onClick={handleFeed}>feed</Button>
-              <Button className={classes.feedButton} style={{ color: selected.members ? '#61FF00' : '#f1f1f1' }} variant='text' onClick={handleMembers}>members</Button>
-            </div>
-            {
-              selected.feed &&
-              <div className={classes.addPostWrap}>
-                <TextField multiline fullWidth variant='standard' label="whats's going on?" onChange={e => setText(e.target.value)}></TextField>
-                <Button className={classes.addPostButton} variant='contained' color='primary' onClick={handlePost}>add post</Button>
+            <div className={classes.aboutWrap}>
+              <div className={classes.infoWrap}>
+                <PersonIcon className={classes.infoIcon} />
+                <Typography variant='body1' className={classes.infoText} >{user.name}</Typography>
               </div>
-            }
-            <div>
-              { selected.feed
-                ? posts.map(post => (
-                  <Fragment key={post.id}>
-                    <FeedCard post={post} />
-                  </Fragment>
-                ))
-                : members.map(member => (
-                  <Fragment key={member.id}>
-                    <MemberCard member={member} />
-                  </Fragment>
-                ))
+              <div className={classes.infoWrap}>
+                <AlternateEmailIcon className={classes.infoIcon} />
+                <Typography variant='body1' className={classes.infoText} >{user.email}</Typography>
+              </div>
+              {
+                !!user.twitch.length &&
+                <div className={classes.twitch}>
+                  <Typography variant='body1' className={classes.infoText} >{user.twitch}</Typography>
+                </div>
+              }
+              {
+                !!user.steam.length &&
+                <div className={classes.infoWrap}>
+                  <Typography variant='body1' className={classes.infoText} >{user.steam}</Typography>
+                </div>
               }
             </div>
-
           </Paper>
         }
       </div>
@@ -482,4 +488,4 @@ const Group: React.FC<Props> = ({ joinGroup, loadGroup, loadPosts, loadMembers, 
   )
 }
 
-export default Group
+export default UserProfile

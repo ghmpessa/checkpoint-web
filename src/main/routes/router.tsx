@@ -1,7 +1,6 @@
 import React from 'react'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
-import { Feed, Group } from '@/presentation/pages/'
-import { makeLogin, makeSignUp, makeProfile, makeCommunity, makeGroup } from '../factories/pages'
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+import { makeLogin, makeSignUp, makeProfile, makeCommunity, makeGroup, makeUserProfile } from '../factories/pages'
 import { ApiContext } from '@/presentation/contexts'
 import { setCurrentAccountAdapter, getCurrentAccountAdapter } from '../adapters/current-account/current-account-adapter'
 
@@ -17,10 +16,12 @@ const Router: React.FC = () => {
         <Switch>
           <Route path='/login' exact component={makeLogin} />
           <Route path='/signup' exact component={makeSignUp} />
-          <Route path='/feed' exact component={Feed} />
+          {/* <Route path='/feed' exact component={Feed} /> */}
           <Route path='/community' exact component={makeCommunity} />
           <Route path='/profile' exact component={makeProfile} />
-          <Route path='/group' exact component={makeGroup} />
+          <Route path='/group/:id' exact component={makeGroup} />
+          <Route path='/user/:id' exact component={makeUserProfile} />
+          <Redirect to='/login' path='/' />
         </Switch>
       </BrowserRouter>
     </ApiContext.Provider>

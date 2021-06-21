@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext, useState, Fragment } from 'react'
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import { ApiContext } from '@/presentation/contexts'
 import AppBar from '@material-ui/core/AppBar'
@@ -20,10 +20,12 @@ import AlternateEmailIcon from '@material-ui/icons/AlternateEmail'
 import Badge from '@material-ui/core/Badge'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/styles'
-import { EditAccount, LoadAccount } from '@/domain/usecases'
-import { ProfileModel } from '@/domain/models'
+import { EditAccount, LoadMe, LoadMyGroups } from '@/domain/usecases'
+import { GroupModel, ProfileModel } from '@/domain/models'
 import { Input, Button } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
+import GroupCard from './components/group-card'
+import InputLabel from '@material-ui/core/InputLabel'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -366,19 +368,6 @@ const PrimarySearchAppBar = (): any => {
           <Typography className={classes.title} variant="h6" noWrap>
             checkpoint
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton
@@ -421,11 +410,12 @@ const PrimarySearchAppBar = (): any => {
 }
 
 type Props = {
-  loadAccount: LoadAccount
+  loadMe: LoadMe
   editAccount: EditAccount
+  loadMyGroups: LoadMyGroups
 }
 
-const Profile: React.FC<Props> = ({ loadAccount, editAccount }: Props) => {
+const Profile: React.FC<Props> = ({ loadMe, editAccount, loadMyGroups }: Props) => {
   const classes = useStyles()
 
   const { getCurrentAccount } = useContext(ApiContext)
@@ -436,19 +426,30 @@ const Profile: React.FC<Props> = ({ loadAccount, editAccount }: Props) => {
     name: '',
     email: ''
   })
+  const [groups, setGroups] = useState<GroupModel[]>([])
   const [editedUser, setEditedUser] = useState<ProfileModel>()
   const [error, setError] = useState('')
   const [edit, setEdit] = useState(false)
 
   useEffect(() => {
-    const userId = getCurrentAccount().userId
-
-    loadAccount.load(userId)
+    loadMe.load()
       .then(profile => {
         setUser(profile)
         setLoading(false)
       })
       .catch(error => {
+        setError(error.message)
+      })
+  }, [])
+
+  useEffect(() => {
+    loadMyGroups.load()
+      .then(groups => {
+        setGroups(groups)
+        setLoading(false)
+      })
+      .catch(error => {
+        setLoading(false)
         setError(error.message)
       })
   }, [])
@@ -550,10 +551,53 @@ const Profile: React.FC<Props> = ({ loadAccount, editAccount }: Props) => {
                       />
                     : <Typography variant='body1' className={classes.infoText} >{user.email}</Typography>}
               </div>
-              <div className={classes.twitch}>
-                <Typography variant='body1' className={classes.infoText} >twitch.tv/gafallen</Typography>
-              </div>
+              { edit
+                ? <div className={classes.twitch}>
+                   <Input
+                      disableUnderline
+                      className={classes.inputWrap}
+                      fullWidth
+                      classes={{
+                        input: classes.input
+                      }}
+                      defaultValue={user.twitch}
+                      onChange={e => setEditedUser({ ...editedUser, twitch: e.target.value })}
+                    />
+                </div>
+                : !!user.twitch.length &&
+                <div className={classes.twitch}>
+                  <Typography variant='body1' className={classes.infoText} >{user.twitch}</Typography>
+                </div>
+              }
+              { edit
+                ? <div className={edit ? classes.editWrap : classes.infoWrap}>
+                   <Input
+                      disableUnderline
+                      className={classes.inputWrap}
+                      fullWidth
+                      classes={{
+                        input: classes.input
+                      }}
+                      defaultValue={user.steam.length ? user.steam : 'your steam link'}
+                      onChange={e => setEditedUser({ ...editedUser, steam: e.target.value })}
+                    />
+                </div>
+                : !!user.steam.length &&
+                <div className={edit ? classes.editWrap : classes.infoWrap}>
+                  <Typography variant='body1' className={classes.infoText} >{user.steam}</Typography>
+                </div>
+              }
               { edit && <Button className={classes.button} variant='contained' color='primary' onClick={handleEdit}>save</Button>}
+            </div>
+            <h2>my groups</h2>
+            <div>
+              {
+                groups.map(group => (
+                  <Fragment key={group.id}>
+                    <GroupCard group={group} />
+                  </Fragment>
+                ))
+              }
             </div>
           </Paper>
         }

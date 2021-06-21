@@ -101,7 +101,7 @@ const Login: React.FC<Props> = ({ validation, authentication }: Props) => {
 
       const account = await authentication.auth(user)
 
-      history.replace('/feed')
+      history.replace('/community')
 
       setCurrentAccount(account)
 
