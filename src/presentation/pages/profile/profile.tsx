@@ -567,7 +567,7 @@ const Profile: React.FC<Props> = ({ loadMe, editAccount, loadMyGroups }: Props) 
                       classes={{
                         input: classes.input
                       }}
-                      defaultValue={user.twitch}
+                      defaultValue={user.twitch.length ? user.twitch : 'your twitch link'}
                       onChange={e => setEditedUser({ ...editedUser, twitch: e.target.value })}
                     />
                 </div>
@@ -597,7 +597,7 @@ const Profile: React.FC<Props> = ({ loadMe, editAccount, loadMyGroups }: Props) 
               { edit && <Button className={classes.button} variant='contained' color='primary' onClick={handleEdit}>save</Button>}
             </div>
             <h2>my groups</h2>
-            <div>
+            <div style={{ width: '100%' }}>
               {
                 groups.map(group => (
                   <Fragment key={group.id}>

@@ -357,7 +357,7 @@ const Group: React.FC<Props> = ({ joinGroup, loadGroup, loadPosts, loadMembers, 
 
       joinGroup.join({
         bind: true,
-        groupId: '60c6c414c63726a560d882b0'
+        groupId: group.id
       })
 
       setLoading(false)
@@ -456,11 +456,11 @@ const Group: React.FC<Props> = ({ joinGroup, loadGroup, loadPosts, loadMembers, 
             {
               selected.feed &&
               <div className={classes.addPostWrap}>
-                <TextField multiline fullWidth variant='standard' label="whats's going on?" onChange={e => setText(e.target.value)}></TextField>
+                <TextField multiline fullWidth variant='standard' label="whats's going on?" onChange={e => setText(e.target.value)} InputLabelProps={{ style: { color: '#f1f1f1' } }}></TextField>
                 <Button className={classes.addPostButton} variant='contained' color='primary' onClick={handlePost}>add post</Button>
               </div>
             }
-            <div>
+            <div style={{ width: '100%' }}>
               { selected.feed
                 ? posts.map(post => (
                   <Fragment key={post.id}>

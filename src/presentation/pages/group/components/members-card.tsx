@@ -13,10 +13,9 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: 20,
       padding: 10,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       margin: 10,
-      position: 'relative',
-      paddingTop: 0
+      position: 'relative'
     },
     info: {
       display: 'flex',
@@ -37,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 'bold',
       fontSize: 16,
       position: 'absolute',
-      bottom: -10
+      right: 20
     },
     link: {
       textDecoration: 'none',
@@ -60,12 +59,12 @@ const MemberCard: React.FC<Props> = ({ member }: Props) => {
       <div className={classes.info}>
         <h4 className={classes.title}>{member.username}</h4>
         <h4 className={classes.subtitle}>{member.name}</h4>
-        <Button variant='text' color='primary' className={classes.button} >
-          <Link className={classes.link} to={`/user/${member.id}`}>
-            visit
-          </Link>
-        </Button>
       </div>
+      <Button variant='text' color='primary' className={classes.button} >
+        <Link className={classes.link} to={`/user/${member.id}`}>
+          visit
+        </Link>
+      </Button>
     </div>
   )
 }

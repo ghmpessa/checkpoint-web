@@ -4,6 +4,7 @@ import { Theme } from '@/presentation/styles/theme'
 import { Button, createStyles, Grid, Link, makeStyles, Paper, TextField, Typography } from '@material-ui/core'
 import { AddAccount, AddAccountParams } from '@/domain/usecases'
 import { Validation } from '@/presentation/protocols/validation'
+import { useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme = Theme) => createStyles({
   root: {
@@ -58,11 +59,16 @@ type Props = {
 
 const Login: React.FC<Props> = ({ validation, addAccount }: Props) => {
   const classes = useStyles()
+
+  const history = useHistory()
+
   const [user, setUser] = useState<AddAccountParams>({
     username: '',
     name: '',
     email: '',
-    password: ''
+    password: '',
+    twitch: '',
+    steam: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState({
@@ -103,6 +109,11 @@ const Login: React.FC<Props> = ({ validation, addAccount }: Props) => {
       }
 
       setLoading(true)
+
+      addAccount.add(user)
+
+      setLoading(false)
+      history.replace('/login')
     } catch (error) {
       setLoading(false)
       setError({
@@ -121,6 +132,8 @@ const Login: React.FC<Props> = ({ validation, addAccount }: Props) => {
           <TextField onBlur={() => setTouched({ ...touched, name: true })} error={error.nameError && touched.name} helperText={touched.name ? error.nameError : ''} onChange={e => setUser({ ...user, name: e.target.value })} variant='outlined' className={classes.input} label='name' InputLabelProps={{ style: { color: '#f1f1f1' } }} />
           <TextField onBlur={() => setTouched({ ...touched, email: true })} error={error.emailError && touched.email} helperText={touched.email ? error.emailError : ''} onChange={e => setUser({ ...user, email: e.target.value })} variant='outlined' className={classes.input} type='email' label='email' InputLabelProps={{ style: { color: '#f1f1f1' } }} />
           <TextField onBlur={() => setTouched({ ...touched, password: true })} error={error.passwordError && touched.password} helperText={touched.password ? error.passwordError : ''} onChange={e => setUser({ ...user, password: e.target.value })} variant='outlined' className={classes.input} type='password' label='password' InputLabelProps={{ style: { color: '#f1f1f1' } }} />
+          <TextField onBlur={() => setTouched({ ...touched, password: true })} error={error.passwordError && touched.password} helperText={touched.password ? error.passwordError : ''} onChange={e => setUser({ ...user, twitch: e.target.value })} variant='outlined' className={classes.input} label='twitch' InputLabelProps={{ style: { color: '#f1f1f1' } }} />
+          <TextField onBlur={() => setTouched({ ...touched, password: true })} error={error.passwordError && touched.password} helperText={touched.password ? error.passwordError : ''} onChange={e => setUser({ ...user, steam: e.target.value })} variant='outlined' className={classes.input} label='steam' InputLabelProps={{ style: { color: '#f1f1f1' } }} />
           <Button disabled={formInvalid} className={classes.button} type='submit' variant='contained' color='primary'>sign in</Button>
         </Paper>
       </form>

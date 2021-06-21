@@ -16,7 +16,9 @@ const useStyles = makeStyles((theme: Theme) =>
       border: '1px solid #f1f1f1',
       padding: 10,
       borderRadius: 10,
-      margin: 5
+      margin: 5,
+      alignItems: 'center',
+      justifyContent: 'space-around'
     },
     infos: {
       display: 'flex',
@@ -45,12 +47,12 @@ const GroupCard: React.FC<Props> = ({ group }: Props) => {
         <h3>{group.name}</h3>
         <h4>{`Tag: #${group.tag}`}</h4>
         <h4>{`Created at: ${new Date(group.createdAt).toLocaleDateString()}`}</h4>
+      </div>
       <Button className={classes.button} color='primary' variant='contained'>
         <Link className={classes.link} to={`/group/${group.id}`}>
           see group
         </Link>
       </Button>
-      </div>
     </div>
   )
 }

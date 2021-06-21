@@ -324,7 +324,6 @@ const SearchGroups: React.FC<Props> = ({ createGroup, loadGroups }: Props) => {
               <DialogTitle>create group</DialogTitle>
               <DialogContent className={classes.modalContent}>
                 <TextField onChange={e => setGroup({ ...group, name: e.target.value })} className={classes.modalFields} label='group name' />
-                <TextField onChange={e => setGroup({ ...group, description: e.target.value })} className={classes.modalFields} label='group description' />
               </DialogContent>
             </>
           : <span>{error}</span>

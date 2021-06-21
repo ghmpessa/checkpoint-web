@@ -4,12 +4,12 @@ import { UnexpectedError, InvalidParamError, ServerError } from '../../../domain
 import { GroupModel } from '../../../domain/models'
 
 export class RemoteJoinGroup implements JoinGroup {
-  constructor(
+  constructor (
     private readonly url: string,
     private readonly httpClient: HttpClient<void>
   ) { }
 
-  async join(params: JoinParams): Promise<void> {
+  async join (params: JoinParams): Promise<void> {
     const bind = {
       bind: params.bind
     }
