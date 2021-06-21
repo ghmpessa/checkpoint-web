@@ -77,11 +77,6 @@ const FeedCard: React.FC<Props> = ({ post }: Props) => {
             {post.account.username.slice(0, 1)}
           </Avatar>
         }
-        action={
-          <IconButton className={classes.icons} aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
         classes={{
           title: classes.title,
           subheader: classes.subheader
@@ -94,24 +89,6 @@ const FeedCard: React.FC<Props> = ({ post }: Props) => {
           {post.text}
         </Typography>
       </CardContent>
-      <CardActions disableSpacing>
-        <IconButton className={classes.icons} aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton className={classes.icons} aria-label="share">
-          <ShareIcon />
-        </IconButton>
-        <IconButton
-          className={clsx(classes.expand, classes.icons, {
-            [classes.expandOpen]: expanded
-          })}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ModeCommentIcon />
-        </IconButton>
-      </CardActions>
     </Card>
   )
 }
