@@ -146,7 +146,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     avatar: {
       height: 150,
-      width: 150
+      width: 150,
+      backgroundColor: theme.palette.primary.main
     },
     badgeText: {
       color: '#000',
@@ -265,6 +266,10 @@ const useStyles = makeStyles((theme: Theme) =>
         border: `1px solid ${theme.palette.primary.main}`,
         content: '""'
       }
+    },
+    avatarLetter: {
+      fontWeight: 'bold',
+      color: '#000'
     }
   })
 )
@@ -453,9 +458,11 @@ const UserProfile: React.FC<Props> = ({ loadAccount }: Props) => {
                   badge: classes.badgeText,
                   anchorOriginBottomRightCircle: classes.anchorOriginBottomRightCircle
                 }}
-                badgeContent={user.level}
+                badgeContent={user.level === 0 ? '0' : user.level}
               >
-                <Avatar className={classes.avatar} />
+                <Avatar className={classes.avatar}>
+                  <Typography variant='h1' className={classes.avatarLetter}>{user.username.slice(0,1)}</Typography>
+                </Avatar>
               </StyledBadge>
               <Typography variant='h4' className={classes.profileName}>{user.username}</Typography>
             </Paper>
