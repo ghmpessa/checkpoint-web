@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-cli serve --open --mode development",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:cypress": "cypress open"
+    "test:cypress": "cypress open",
+	"build": "webpack --config webpack.config.js"
   },
   "keywords": [],
   "author": "",
